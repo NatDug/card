@@ -3,6 +3,7 @@ import SmartCard from './components/SmartCard';
 import NFCHandler from './components/NFCHandler';
 import CardData from './components/CardData';
 import LogViewer from './components/LogViewer';
+import WalletIntegration from './components/WalletIntegration';
 
 function App() {
   const [isNFCSupported, setIsNFCSupported] = useState(false);
@@ -112,7 +113,7 @@ function App() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Smart Card and Controls */}
           <div className="space-y-6">
             <SmartCard 
@@ -161,6 +162,11 @@ function App() {
               cardData={cardData}
               onUpdate={updateCardData}
             />
+          </div>
+
+          {/* Middle Column - Digital Wallet Integration */}
+          <div className="space-y-6">
+            <WalletIntegration cardData={cardData} />
           </div>
 
           {/* Right Column - NFC Handler and Logs */}
