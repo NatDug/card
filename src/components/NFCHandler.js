@@ -1,28 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const NFCHandler = ({ isSupported, isEnabled, onRead, onStatusChange, addLog }) => {
   const [isScanning, setIsScanning] = useState(false);
-  const [nfcReader, setNfcReader] = useState(null);
   const [lastRead, setLastRead] = useState(null);
   const scanIntervalRef = useRef(null);
+  const nfcReaderRef = useRef(null);
 
-  useEffect(() => {
-    if (isSupported && isEnabled) {
-      initializeNFC();
-    } else {
-      cleanupNFC();
-    }
-
-    return () => {
-      cleanupNFC();
-    };
-  }, [isSupported, isEnabled]);
-
-  const initializeNFC = async () => {
+  const initializeNFC = useCallback(async () => {
     try {
-      if ('NDEFReader' in window) {
-        const reader = new NDEFReader();
-        setNfcReader(reader);
+      if (typeof window !== 'undefined' && 'NDEFReader' in window) {
+        const reader = new window.NDEFReader();
+        nfcReaderRef.current = reader;
 
         reader.addEventListener('reading', (event) => {
           handleNFCReading(event);
@@ -41,16 +29,30 @@ const NFCHandler = ({ isSupported, isEnabled, onRead, onStatusChange, addLog }) 
       addLog(`NFC initialization failed: ${error.message}`, 'error');
       onStatusChange(false);
     }
-  };
+  }, [onRead, onStatusChange, addLog]);
 
-  const cleanupNFC = () => {
+  const cleanupNFC = useCallback(() => {
     if (scanIntervalRef.current) {
       clearInterval(scanIntervalRef.current);
       scanIntervalRef.current = null;
     }
+    if (nfcReaderRef.current) {
+      nfcReaderRef.current = null;
+    }
     setIsScanning(false);
-    setNfcReader(null);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isSupported && isEnabled) {
+      initializeNFC();
+    } else {
+      cleanupNFC();
+    }
+
+    return () => {
+      cleanupNFC();
+    };
+  }, [isSupported, isEnabled, initializeNFC, cleanupNFC]);
 
   const handleNFCReading = (event) => {
     const decoder = new TextDecoder();
