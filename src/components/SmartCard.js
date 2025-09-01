@@ -7,12 +7,14 @@ const SmartCard = ({ cardData, isSimulating }) => {
 
   const getCardTypeColor = (type) => {
     switch (type) {
-      case 'VISA':
-        return 'from-blue-600 to-blue-800';
-      case 'MASTERCARD':
-        return 'from-red-600 to-orange-600';
-      case 'AMEX':
-        return 'from-green-600 to-green-800';
+      case 'TRAVEL':
+        return 'from-green-600 to-blue-600';
+      case 'METRO':
+        return 'from-orange-600 to-red-600';
+      case 'BUS':
+        return 'from-purple-600 to-indigo-600';
+      case 'TRAIN':
+        return 'from-yellow-600 to-orange-600';
       default:
         return 'from-gray-600 to-gray-800';
     }
@@ -20,20 +22,22 @@ const SmartCard = ({ cardData, isSimulating }) => {
 
   const getCardTypeIcon = (type) => {
     switch (type) {
-      case 'VISA':
-        return '💳';
-      case 'MASTERCARD':
-        return '💳';
-      case 'AMEX':
-        return '💳';
+      case 'TRAVEL':
+        return '🚇';
+      case 'METRO':
+        return '🚇';
+      case 'BUS':
+        return '🚌';
+      case 'TRAIN':
+        return '🚂';
       default:
-        return '💳';
+        return '🎫';
     }
   };
 
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-      <h2 className="text-xl font-semibold text-white mb-4">Smart Card</h2>
+      <h2 className="text-xl font-semibold text-white mb-4">Travel Card</h2>
       
       <div className={`relative w-full max-w-sm mx-auto ${
         isSimulating ? 'animate-glow' : ''
@@ -65,14 +69,14 @@ const SmartCard = ({ cardData, isSimulating }) => {
           )}
 
           {/* Card Number */}
-          <div className="absolute bottom-20 left-6 right-6">
-            <div className="text-2xl font-mono tracking-wider">
-              {formatCardNumber(cardData.cardNumber)}
+          <div className="absolute bottom-24 left-6 right-6">
+            <div className="text-xl font-mono tracking-wider">
+              {cardData.cardNumber}
             </div>
           </div>
 
           {/* Card Holder */}
-          <div className="absolute bottom-12 left-6">
+          <div className="absolute bottom-16 left-6">
             <div className="text-sm text-white/80 uppercase tracking-wide">
               Card Holder
             </div>
@@ -82,7 +86,7 @@ const SmartCard = ({ cardData, isSimulating }) => {
           </div>
 
           {/* Expiry Date */}
-          <div className="absolute bottom-12 right-6">
+          <div className="absolute bottom-16 right-6">
             <div className="text-sm text-white/80 uppercase tracking-wide">
               Expires
             </div>
@@ -91,20 +95,37 @@ const SmartCard = ({ cardData, isSimulating }) => {
             </div>
           </div>
 
-          {/* Card Type */}
-          <div className="absolute bottom-4 left-6">
-            <div className="text-sm font-semibold">
-              {cardData.cardType}
-            </div>
-          </div>
-
           {/* Balance */}
-          <div className="absolute bottom-4 right-6">
+          <div className="absolute bottom-8 left-6">
             <div className="text-sm text-white/80">
               Balance
             </div>
             <div className="text-lg font-bold">
               {cardData.currency} {cardData.balance.toFixed(2)}
+            </div>
+          </div>
+
+          {/* Travel Points */}
+          <div className="absolute bottom-8 right-6">
+            <div className="text-sm text-white/80">
+              Points
+            </div>
+            <div className="text-lg font-bold">
+              {cardData.travelPoints}
+            </div>
+          </div>
+
+          {/* Membership Level */}
+          <div className="absolute bottom-2 left-6">
+            <div className="text-sm font-semibold text-yellow-300">
+              {cardData.membershipLevel}
+            </div>
+          </div>
+
+          {/* Valid Zones */}
+          <div className="absolute bottom-2 right-6">
+            <div className="text-sm text-white/80">
+              Zones: {cardData.validZones?.join(', ') || 'ALL'}
             </div>
           </div>
         </div>

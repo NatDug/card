@@ -27,25 +27,29 @@ const CardData = ({ cardData, onUpdate }) => {
   };
 
   const generateRandomCard = () => {
-    const cardTypes = ['VISA', 'MASTERCARD', 'AMEX'];
+    const cardTypes = ['TRAVEL', 'METRO', 'BUS', 'TRAIN'];
     const randomType = cardTypes[Math.floor(Math.random() * cardTypes.length)];
     
-    const randomCardNumber = Array.from({length: 16}, () => 
-      Math.floor(Math.random() * 10)
-    ).join('');
+    const randomCardNumber = `TRV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`;
     
-    const formattedCardNumber = randomCardNumber.replace(/(\d{4})/g, '$1-').slice(0, -1);
-    
-    const randomBalance = Math.floor(Math.random() * 10000) + 100;
+    const randomBalance = Math.floor(Math.random() * 200) + 10;
+    const randomPoints = Math.floor(Math.random() * 5000) + 100;
+    const membershipLevels = ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
+    const randomLevel = membershipLevels[Math.floor(Math.random() * membershipLevels.length)];
+    const zones = ['A', 'B', 'C', 'D'];
+    const randomZones = zones.slice(0, Math.floor(Math.random() * zones.length) + 1);
     
     const newCardData = {
-      cardNumber: formattedCardNumber,
+      cardNumber: randomCardNumber,
       cardHolder: 'JOHN DOE',
       expiryDate: '12/25',
-      cvv: '123',
       cardType: randomType,
       balance: randomBalance,
-      currency: 'USD'
+      currency: 'USD',
+      travelPoints: randomPoints,
+      membershipLevel: randomLevel,
+      validZones: randomZones,
+      lastUsed: new Date().toISOString().split('T')[0]
     };
     
     onUpdate(newCardData);
@@ -54,7 +58,7 @@ const CardData = ({ cardData, onUpdate }) => {
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-white">Card Data</h2>
+        <h2 className="text-xl font-semibold text-white">Travel Card Data</h2>
         <div className="space-x-2">
           {!isEditing ? (
             <>
@@ -127,7 +131,7 @@ const CardData = ({ cardData, onUpdate }) => {
           )}
         </div>
 
-        {/* Expiry Date and CVV */}
+        {/* Expiry Date and Last Used */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-blue-200 mb-1">Expiry Date</label>
@@ -147,18 +151,17 @@ const CardData = ({ cardData, onUpdate }) => {
           </div>
           
           <div>
-            <label className="block text-sm text-blue-200 mb-1">CVV</label>
+            <label className="block text-sm text-blue-200 mb-1">Last Used</label>
             {isEditing ? (
               <input
-                type="text"
-                value={editData.cvv}
-                onChange={(e) => handleInputChange('cvv', e.target.value)}
+                type="date"
+                value={editData.lastUsed}
+                onChange={(e) => handleInputChange('lastUsed', e.target.value)}
                 className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400"
-                placeholder="123"
               />
             ) : (
               <div className="px-3 py-2 bg-white/5 rounded-lg text-white">
-                {cardData.cvv}
+                {cardData.lastUsed}
               </div>
             )}
           </div>
@@ -173,9 +176,10 @@ const CardData = ({ cardData, onUpdate }) => {
               onChange={(e) => handleInputChange('cardType', e.target.value)}
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-400"
             >
-              <option value="VISA">VISA</option>
-              <option value="MASTERCARD">MASTERCARD</option>
-              <option value="AMEX">AMEX</option>
+              <option value="TRAVEL">TRAVEL</option>
+              <option value="METRO">METRO</option>
+              <option value="BUS">BUS</option>
+              <option value="TRAIN">TRAIN</option>
             </select>
           ) : (
             <div className="px-3 py-2 bg-white/5 rounded-lg text-white">
@@ -223,6 +227,76 @@ const CardData = ({ cardData, onUpdate }) => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Travel Points and Membership Level */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm text-blue-200 mb-1">Travel Points</label>
+            {isEditing ? (
+              <input
+                type="number"
+                value={editData.travelPoints}
+                onChange={(e) => handleInputChange('travelPoints', parseInt(e.target.value))}
+                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400"
+                placeholder="0"
+              />
+            ) : (
+              <div className="px-3 py-2 bg-white/5 rounded-lg text-white">
+                {cardData.travelPoints}
+              </div>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-sm text-blue-200 mb-1">Membership Level</label>
+            {isEditing ? (
+              <select
+                value={editData.membershipLevel}
+                onChange={(e) => handleInputChange('membershipLevel', e.target.value)}
+                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-400"
+              >
+                <option value="BRONZE">BRONZE</option>
+                <option value="SILVER">SILVER</option>
+                <option value="GOLD">GOLD</option>
+                <option value="PLATINUM">PLATINUM</option>
+              </select>
+            ) : (
+              <div className="px-3 py-2 bg-white/5 rounded-lg text-white">
+                {cardData.membershipLevel}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Valid Zones */}
+        <div>
+          <label className="block text-sm text-blue-200 mb-1">Valid Zones</label>
+          {isEditing ? (
+            <div className="space-y-2">
+              {['A', 'B', 'C', 'D'].map(zone => (
+                <label key={zone} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={editData.validZones?.includes(zone) || false}
+                    onChange={(e) => {
+                      const currentZones = editData.validZones || [];
+                      const newZones = e.target.checked
+                        ? [...currentZones, zone]
+                        : currentZones.filter(z => z !== zone);
+                      handleInputChange('validZones', newZones);
+                    }}
+                    className="rounded border-white/20 bg-white/10 text-blue-400 focus:ring-blue-400"
+                  />
+                  <span className="text-white">Zone {zone}</span>
+                </label>
+              ))}
+            </div>
+          ) : (
+            <div className="px-3 py-2 bg-white/5 rounded-lg text-white">
+              {cardData.validZones?.join(', ') || 'ALL'}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -9,13 +9,16 @@ function App() {
   const [isNFCSupported, setIsNFCSupported] = useState(false);
   const [isNFCEnabled, setIsNFCEnabled] = useState(false);
   const [cardData, setCardData] = useState({
-    cardNumber: '1234-5678-9012-3456',
+    cardNumber: 'TRV-2024-001-234',
     cardHolder: 'JOHN DOE',
     expiryDate: '12/25',
-    cvv: '123',
-    cardType: 'VISA',
-    balance: 2500.00,
-    currency: 'USD'
+    cardType: 'TRAVEL',
+    balance: 150.00,
+    currency: 'USD',
+    travelPoints: 2500,
+    membershipLevel: 'GOLD',
+    validZones: ['A', 'B', 'C'],
+    lastUsed: '2024-01-15'
   });
   const [logs, setLogs] = useState([]);
   const [isSimulating, setIsSimulating] = useState(false);
@@ -79,8 +82,30 @@ function App() {
             cardHolder: cardData.cardHolder,
             expiryDate: cardData.expiryDate,
             balance: cardData.balance,
-            currency: cardData.currency
+            currency: cardData.currency,
+            travelPoints: cardData.travelPoints,
+            membershipLevel: cardData.membershipLevel,
+            validZones: cardData.validZones,
+            lastUsed: cardData.lastUsed
           }
+        }
+      },
+      'CHECK_ZONE': {
+        status: '9000',
+        data: {
+          zoneValid: cardData.validZones?.includes(request.zone) || false,
+          membershipLevel: cardData.membershipLevel,
+          travelPoints: cardData.travelPoints
+        }
+      },
+      'DEDUCT_FARE': {
+        status: '9000',
+        data: {
+          previousBalance: cardData.balance,
+          fareAmount: request.amount || 2.50,
+          newBalance: Math.max(0, cardData.balance - (request.amount || 2.50)),
+          pointsEarned: Math.floor((request.amount || 2.50) * 10),
+          transactionId: `TXN-${Date.now()}`
         }
       }
     };
@@ -106,10 +131,10 @@ function App() {
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
-            Smart Card Simulator
+            Travel Card Simulator
           </h1>
           <p className="text-blue-200 text-lg">
-            Simulate a smart card for NFC readers
+            Simulate a travel card for NFC readers
           </p>
         </header>
 
